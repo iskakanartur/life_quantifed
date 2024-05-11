@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Eat Table Contents</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #343a40; /* Dark background color */
+            color: #ffffff; /* Text color */
+        }
+        th, td {
+            text-align: center; /* Center-align table headers and data */
+            vertical-align: middle; /* Vertically center table data */
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-5">
+        <h1 class="mb-4">Eat Table Contents</h1>
+        <div class="table-responsive">
+            <table class="table table-dark table-striped">
+                <thead>
+                    <tr>
+                        <th>Meal</th>
+                        <th>Comment</th>
+                        <th>Time Delta</th>
+                        <th>Date Added</th>
+                        <th>Weight</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in eats %}
+                    <tr>
+                        <td>{{ item.meal }}</td>
+                        <td>{{ item.comment }}</td>
+                        <td>{{ item.time_delta }}</td>
+                        <td>{{ item.date_added.strftime('%Y-%m-%d %H:%M') }}</td>
+                        <td>{{ item.weight }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        
+        <!-- Pagination -->
+        {% if eats.pages > 1 %}
+        <div class="d-flex justify-content-between align-items-center mt-4">
+            <div>
+                <span class="text-muted">Page {{ eats.page }} of {{ eats.pages }}</span>
+            </div>
+            <div>
+                {% if eats.has_prev %}
+                <a href="{{ url_for('main.index', page=1) }}" class="btn btn-light">&laquo; First</a>
+                <a href="{{ url_for('main.index', page=eats.prev_num) }}" class="btn btn-light">&lsaquo; Previous</a>
+                {% endif %}
+                {% if eats.has_next %}
+                <a href="{{ url_for('main.index', page=eats.next_num) }}" class="btn btn-light">Next &rsaquo;</a>
+                <a href="{{ url_for('main.index', page=eats.pages) }}" class="btn btn-light">Last &raquo;</a>
+                {% endif %}
+            </div>
+        </div>
+        {% endif %}
+        
+    </div>
+
+    <!-- Bootstrap JS (optional, if you need JavaScript features) -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
