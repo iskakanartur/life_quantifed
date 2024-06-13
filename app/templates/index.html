@@ -18,6 +18,26 @@
     </style>
 </head>
 <body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="{{ url_for('main.welcome') }}">Life Quantified</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('main.view_eat') }}">Eat Table</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('main.view_exercise') }}">Exercise Table</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
     <div class="container mt-5">
         <h1 class="mb-4">Eat Table Contents</h1>
         <div class="table-responsive">
@@ -32,7 +52,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    {% for item in eats %}
+                    {% for item in eats.items %}
                     <tr>
                         <td>{{ item.meal }}</td>
                         <td>{{ item.comment }}</td>
@@ -53,12 +73,12 @@
             </div>
             <div>
                 {% if eats.has_prev %}
-                <a href="{{ url_for('main.index', page=1) }}" class="btn btn-light">&laquo; First</a>
-                <a href="{{ url_for('main.index', page=eats.prev_num) }}" class="btn btn-light">&lsaquo; Previous</a>
+                <a href="{{ url_for('main.view_eat', page=1) }}" class="btn btn-light">&laquo; First</a>
+                <a href="{{ url_for('main.view_eat', page=eats.prev_num) }}" class="btn btn-light">&lsaquo; Previous</a>
                 {% endif %}
                 {% if eats.has_next %}
-                <a href="{{ url_for('main.index', page=eats.next_num) }}" class="btn btn-light">Next &rsaquo;</a>
-                <a href="{{ url_for('main.index', page=eats.pages) }}" class="btn btn-light">Last &raquo;</a>
+                <a href="{{ url_for('main.view_eat', page=eats.next_num) }}" class="btn btn-light">Next &rsaquo;</a>
+                <a href="{{ url_for('main.view_eat', page=eats.pages) }}" class="btn btn-light">Last &raquo;</a>
                 {% endif %}
             </div>
         </div>
