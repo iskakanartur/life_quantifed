@@ -2,6 +2,8 @@ from . import db
 from sqlalchemy import Numeric
 
 from sqlalchemy import func, event, DDL
+from datetime import datetime
+
 
 class eat(db.Model):
     id = db.Column(db.Integer, primary_key=True)
