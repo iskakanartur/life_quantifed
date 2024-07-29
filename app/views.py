@@ -3,6 +3,13 @@ from app.models import eat, Exercise
 from app import db
 from app.forms import ExerciseForm
 
+
+from datetime import datetime, timedelta
+import matplotlib.pyplot as plt
+import io
+import base64
+
+
 bp = Blueprint('main', __name__)
 
 @bp.route('/')
@@ -49,3 +56,68 @@ def delete_exercise(id):
     db.session.commit()
     flash('Exercise deleted successfully', 'success')
     return redirect(url_for('main.view_exercise'))
+
+
+################################### Visualization #########################
+
+
+@bp.route('/exercise_stats')
+def exercise_stats():
+    # Fetch data from the database
+    daily_stats = get_exercise_stats('daily')
+    weekly_stats = get_exercise_stats('weekly')
+    monthly_stats = get_exercise_stats('monthly')
+
+    # Generate charts
+    daily_chart = create_bar_chart(daily_stats, 'Daily Exercise Stats')
+    weekly_chart = create_bar_chart(weekly_stats, 'Weekly Exercise Stats')
+    monthly_chart = create_bar_chart(monthly_stats, 'Monthly Exercise Stats')
+
+    return render_template('exercise_stats.html', daily_chart=daily_chart, weekly_chart=weekly_chart, monthly_chart=monthly_chart)
+
+
+def get_exercise_stats(period):
+    now = datetime.now()
+
+    if period == 'daily':
+        start_date = now - timedelta(days=1)
+    elif period == 'weekly':
+        start_date = now - timedelta(weeks=1)
+    elif period == 'monthly':
+        start_date = now - timedelta(weeks=4)
+    else:
+        return []
+
+    stats = (Exercise.query
+             .filter(Exercise.date_added >= start_date)
+             .with_entities(Exercise.exercise, db.func.sum(Exercise.count).label('total_count'))
+             .group_by(Exercise.exercise)
+             .all())
+    
+    return stats
+
+
+def create_bar_chart(stats, title):
+    exercises = [stat.exercise for stat in stats]
+    counts = [stat.total_count for stat in stats]
+
+    fig, ax = plt.subplots(figsize=(10, 6))  # Adjust the figure size for better spacing
+    ax.bar(exercises, counts, color='skyblue')
+    ax.set_title(title, color='white')
+    ax.set_xlabel('Exercise', color='white')
+    ax.set_ylabel('Count', color='white')
+    ax.tick_params(axis='x', colors='white')
+    ax.tick_params(axis='y', colors='white')
+    plt.setp(ax.get_xticklabels(), rotation=45, ha='right', color='white')  # Rotate x-axis labels
+    fig.patch.set_facecolor('#343a40')  # Dark background color
+    ax.set_facecolor('#343a40')  # Dark background color for the plot area
+
+    # Save the chart to a bytes buffer
+    buf = io.BytesIO()
+    plt.savefig(buf, format='png', facecolor=fig.get_facecolor())
+    buf.seek(0)
+    chart_data = base64.b64encode(buf.getvalue()).decode('utf-8')
+    buf.close()
+
+    return f'data:image/png;base64,{chart_data}'
+
